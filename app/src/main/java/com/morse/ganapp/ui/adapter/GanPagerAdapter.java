@@ -1,6 +1,7 @@
 package com.morse.ganapp.ui.adapter;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -34,11 +35,14 @@ public class GanPagerAdapter extends FragmentStatePagerAdapter {
             case 3:
             case 4:
                 fragment=new ArtcleFragment();
+                Bundle bundle=new Bundle();
+                bundle.putInt("position",position);
+                fragment.setArguments(bundle);
                 break;
             case 5:
                 fragment=new VideoFragment();
         }
-        return null;
+        return fragment;
     }
 
     @Override

@@ -46,6 +46,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
     private void setViewPager() {
         GanPagerAdapter adapter = new GanPagerAdapter(this,getSupportFragmentManager());
         mPager.setAdapter(adapter);

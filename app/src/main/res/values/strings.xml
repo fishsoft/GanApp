@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">GanApp</string>
+    <string name="natigation_open">打开</string>
+    <string name="navigation_closed">关闭</string>
+</resources>

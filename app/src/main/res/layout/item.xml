@@ -11,22 +11,35 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="wrap_content"
         android:padding="5dp">
 
-        <TextView
-            android:id="@+id/artcle_title"
+        <LinearLayout
+            android:id="@+id/container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:text="安卓各版本状态栏适配方案"
-            android:textSize="24sp"/>
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/artcle_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:text="安卓各版本状态栏适配方案"
+                android:textSize="24sp"/>
+
+            <VideoView
+                android:id="@+id/video_view"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:visibility="gone"/>
+        </LinearLayout>
 
         <TextView
             android:id="@+id/artcle_who"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/artcle_title"
+            android:layout_below="@+id/container"
             android:padding="5dp"
             android:text="蒋朋"
             android:textColor="@android:color/white"/>

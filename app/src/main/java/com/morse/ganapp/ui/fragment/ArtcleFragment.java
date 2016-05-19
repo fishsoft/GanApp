@@ -46,7 +46,7 @@ public class ArtcleFragment extends BaseFragment implements SwipeRefreshLayout.O
 
     @Override
     protected View setLayout(ViewGroup container) {
-        return LayoutInflater.from(getActivity()).inflate(R.layout.fragment_actcle, container, false);
+        return LayoutInflater.from(getActivity()).inflate(R.layout.fragment_artcle, container, false);
     }
 
     @Override

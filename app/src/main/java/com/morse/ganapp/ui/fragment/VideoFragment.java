@@ -19,7 +19,7 @@ public class VideoFragment extends BaseFragment {
 
     @Override
     protected View setLayout(ViewGroup container) {
-        return LayoutInflater.from(getActivity()).inflate(R.layout.fragment_actcle, container, false);
+        return LayoutInflater.from(getActivity()).inflate(R.layout.fragment_artcle, container, false);
     }
 
     @Override

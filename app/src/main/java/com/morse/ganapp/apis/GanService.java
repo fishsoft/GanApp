@@ -13,7 +13,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * 邮箱：zm902485jgsurjgc@163.com
  */
 public class GanService {
-    private final static String BASE_URI = "http://gank.io/api/";
+    private final static String BASE_URI = "http://gank.io/api/data/";
 
     private static OkHttpClient client = new OkHttpClient.Builder()
             .addInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))

@@ -1,6 +1,10 @@
 package com.morse.ganapp.ui.fragment;
 
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+
+import com.morse.ganapp.R;
 
 /**
  * 作者：Morse
@@ -9,9 +13,13 @@ import android.view.View;
  * 邮箱：zm902485jgsurjgc@163.com
  */
 public class VideoFragment extends BaseFragment {
+
+    public VideoFragment() {
+    }
+
     @Override
-    protected View setLayout() {
-        return null;
+    protected View setLayout(ViewGroup container) {
+        return LayoutInflater.from(getActivity()).inflate(R.layout.fragment_actcle, container, false);
     }
 
     @Override

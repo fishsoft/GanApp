@@ -1,14 +1,11 @@
 package com.morse.ganapp.ui.adapter;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import com.morse.ganapp.R;
 import com.morse.ganapp.ui.fragment.ArtcleFragment;
-import com.morse.ganapp.ui.fragment.VideoFragment;
 
 /**
  * 作者：Morse
@@ -18,36 +15,38 @@ import com.morse.ganapp.ui.fragment.VideoFragment;
  */
 public class GanPagerAdapter extends FragmentStatePagerAdapter {
 
-    private String[] mTypes = null;
+    private String[] mTypes = new String[]{"Android","iOS","前端","瞎推荐","推展资源","休息视频"};
 
-    public GanPagerAdapter(Context context, FragmentManager manager) {
+    public GanPagerAdapter(FragmentManager manager,String[] types) {
         super(manager);
-        mTypes = context.getResources().getStringArray(R.array.ganType);
+        mTypes = types;
     }
 
     @Override
     public Fragment getItem(int position) {
-        Fragment fragment=null;
-        switch (position){
-            case 0:
-            case 1:
-            case 2:
-            case 3:
-            case 4:
-                fragment=new ArtcleFragment();
-                Bundle bundle=new Bundle();
-                bundle.putInt("position",position);
-                fragment.setArguments(bundle);
-                break;
-            case 5:
-                fragment=new VideoFragment();
-        }
+        Bundle bundle = new Bundle();
+        bundle.putString("position", mTypes[position]);
+//        switch (position) {
+//            case 0:
+//            case 1:
+//            case 2:
+//            case 3:
+//            case 4:
+        ArtcleFragment fragment = new ArtcleFragment();
+//                break;
+//            case 5:
+//                fragment = VideoFragment.getInstance();
+//                break;
+//            default:
+//                break;
+//        }
+        fragment.setArguments(bundle);
         return fragment;
     }
 
     @Override
     public int getCount() {
-        return mTypes.length;
+        return 6;
     }
 
     @Override

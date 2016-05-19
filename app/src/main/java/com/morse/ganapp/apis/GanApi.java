@@ -1,11 +1,10 @@
 package com.morse.ganapp.apis;
 
+import com.morse.ganapp.model.GanBean;
 import com.morse.ganapp.model.ResultEntity;
 
-import java.util.List;
-
 import retrofit2.http.GET;
-import retrofit2.http.Query;
+import retrofit2.http.Path;
 import rx.Observable;
 
 /**
@@ -25,7 +24,7 @@ public interface GanApi {
      * @return List<ResultEntity>
      */
     @GET("{type}/{num}/{page}")
-    Observable<List<ResultEntity>> getGan(@Query("type") String type, @Query("num") int num, @Query("page") int page);
+    Observable<GanBean> getGan(@Path("type") String type, @Path("num") int num, @Path("page") int page);
 
     /**
      * 根据时间获取每天的数据
@@ -36,5 +35,5 @@ public interface GanApi {
      * @return ResultEntity
      */
     @GET("day/{year}/{mouth}/{daily}")
-    Observable<ResultEntity> getDailyGan(@Query("year") int year, @Query("mouth") int mouth, @Query("daily") int daily);
+    Observable<ResultEntity> getDailyGan(@Path("year") int year, @Path("mouth") int mouth, @Path("daily") int daily);
 }

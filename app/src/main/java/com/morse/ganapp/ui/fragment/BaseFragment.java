@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import butterknife.ButterKnife;
+
 /**
  * 作者：Morse
  * 创建时间：2016/5/18 17:05
@@ -18,7 +20,7 @@ public abstract class BaseFragment extends Fragment implements View.OnClickListe
 
     protected View view;
 
-    protected abstract View setLayout();
+    protected abstract View setLayout(ViewGroup container);
 
     protected void beforeView() {
     }
@@ -26,6 +28,11 @@ public abstract class BaseFragment extends Fragment implements View.OnClickListe
     ;
 
     protected abstract void initView();
+
+    protected void afterView() {
+    }
+
+    ;
 
     protected void viewClick(View view) {
     }
@@ -41,7 +48,8 @@ public abstract class BaseFragment extends Fragment implements View.OnClickListe
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if (null == container) {
-            view = setLayout();
+            view = setLayout(container);
+            ButterKnife.inject(getActivity());
             beforeView();
             initView();
         }

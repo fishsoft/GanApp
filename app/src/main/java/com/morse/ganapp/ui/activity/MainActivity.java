@@ -45,6 +45,8 @@ public class MainActivity extends AppCompatActivity {
             setupActionBarToggle();
         }
 
+        mPager.setCurrentItem(0);
+
     }
 
     @Override
@@ -53,7 +55,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setViewPager() {
-        GanPagerAdapter adapter = new GanPagerAdapter(getSupportFragmentManager(), getResources().getStringArray(R.array.ganType));
+        String[] types = getResources().getStringArray(R.array.ganType);
+        GanPagerAdapter adapter = new GanPagerAdapter(getSupportFragmentManager(), types);
         mPager.setAdapter(adapter);
         mTab.setupWithViewPager(mPager);
     }

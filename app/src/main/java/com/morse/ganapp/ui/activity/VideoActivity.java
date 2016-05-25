@@ -28,6 +28,7 @@ public class VideoActivity extends BaseActivity {
     @Override
     protected void afterView() {
         initWebView();
+        mVideoWeb.loadUrl(getIntent().getStringExtra("url"));
     }
 
     /**

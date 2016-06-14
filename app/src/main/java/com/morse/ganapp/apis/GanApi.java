@@ -15,6 +15,9 @@ import rx.Observable;
  */
 public interface GanApi {
 
+    @GET()
+    void getArtcle();
+
     /**
      * 根据类型请求数据
      *
@@ -23,8 +26,19 @@ public interface GanApi {
      * @param page 页数
      * @return List<ResultEntity>
      */
-    @GET("{type}/{num}/{page}")
+    @GET("data/{type}/{num}/{page}")
     Observable<GanBean> getGan(@Path("type") String type, @Path("num") int num, @Path("page") int page);
+
+    /**
+     * 根据类型请求数据
+     *
+     * @param type 类型
+     * @param num  每页请求个数
+     * @param page 页数
+     * @return List<ResultEntity>
+     */
+    @GET("random/data/{type}/{num}")
+    Observable<GanBean> getGan(@Path("type") String type, @Path("num") int num);
 
     /**
      * 根据时间获取每天的数据

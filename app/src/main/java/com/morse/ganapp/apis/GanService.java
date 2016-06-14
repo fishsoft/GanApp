@@ -1,5 +1,7 @@
 package com.morse.ganapp.apis;
 
+import android.text.TextUtils;
+
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -13,24 +15,31 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * 邮箱：zm902485jgsurjgc@163.com
  */
 public class GanService {
-    private final static String BASE_URI = "http://gank.io/api/data/";
+    private final static String BASE_URI = "http://gank.io/api/";
 
-    private static OkHttpClient client = new OkHttpClient.Builder()
-            .addInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
-            .build();
-
-    private static Retrofit retrofit=new Retrofit.Builder()
-            .baseUrl(BASE_URI)
-            .client(client)
-            .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-            .addConverterFactory(GsonConverterFactory.create())
-            .build();
-
-    private GanService(){
+    private GanService() {
 
     }
 
-    public static <T>T createApi(Class<T> cls){
-        return retrofit.create(cls);
+    private static OkHttpClient getClient() {
+        return new OkHttpClient.Builder()
+                .addInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+                .build();
+    }
+
+    private static Retrofit getRetrofit(String url) {
+        if (TextUtils.isEmpty(url)) {
+            url = BASE_URI;
+        }
+        return new Retrofit.Builder()
+                .baseUrl(BASE_URI)
+                .client(getClient())
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+    }
+
+    public static <T> T createApi(Class<T> cls, String url) {
+        return getRetrofit(url).create(cls);
     }
 }

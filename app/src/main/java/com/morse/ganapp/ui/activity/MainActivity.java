@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.inject(this);
 
         setSupportActionBar(mToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         setViewPager();
 

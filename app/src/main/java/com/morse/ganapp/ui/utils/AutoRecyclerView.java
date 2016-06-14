@@ -55,7 +55,7 @@ public class AutoRecyclerView extends RecyclerView {
             if (getLayoutManager() instanceof LinearLayoutManager) {
                 int lastVisiblePos = ((LinearLayoutManager) getLayoutManager()).findLastVisibleItemPosition();
                 int itemCount = getAdapter().getItemCount();
-                if (loadMoreListener != null && !isLoading && lastVisiblePos > itemCount - 2 && dy > 0) {
+                if (null != loadMoreListener && !isLoading && lastVisiblePos > itemCount - 2 && dy > 0) {
                     loadMoreListener.onLoadMore();
                     isLoading = true;
                 }

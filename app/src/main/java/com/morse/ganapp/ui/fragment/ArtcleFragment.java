@@ -53,7 +53,6 @@ public class ArtcleFragment extends Fragment implements SwipeRefreshLayout.OnRef
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mType = getArguments().getString("position");
-        Log.d("GanPagerAdapter", "ArtcleFragment beforeView" + mType);
     }
 
     @Nullable
@@ -84,7 +83,6 @@ public class ArtcleFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 .VERTICAL_LIST));
         mArtcleRecy.setLoadMoreListener(this);
 
-        Log.d("GanPagerAdapter", "ArtcleFragment" + mType);
         initData();
         loadData();
     }
@@ -96,7 +94,7 @@ public class ArtcleFragment extends Fragment implements SwipeRefreshLayout.OnRef
     }
 
     private void loadData() {
-        Log.d("GanPagerAdapter", "ArtcleFragment loadData");
+        Log.d("loadData", "mPage:" + mPage);
         GanService.createApi(GanApi.class, null)
                 .getGan(mType, 10, mPage)
                 .subscribeOn(Schedulers.io())
@@ -110,22 +108,27 @@ public class ArtcleFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 .subscribe(new Observer<List<ResultEntity>>() {
                     @Override
                     public void onCompleted() {
-
+                        mArtcleSwipe.setRefreshing(false);
+                        mArtcleRecy.setLoading(false);
                     }
 
                     @Override
                     public void onError(Throwable e) {
-
+                        mArtcleSwipe.setRefreshing(false);
+                        mArtcleRecy.setLoading(false);
                     }
 
                     @Override
                     public void onNext(List<ResultEntity> resultEntities) {
-                        Log.d("GanPagerAdapter", "ArtcleFragment" + resultEntities.toString());
+                        if (1 == mPage) {
+                            mResultEntities.clear();
+                        }
                         mResultEntities.addAll(resultEntities);
                         mAdapter.notifyDataSetChanged();
-                        if (resultEntities.size() >= 10) {
-                            mPage++;
+                        if (resultEntities.size() == 10) {
+                            mPage += 1;
                         }
+                        Log.d("loadData", "size:" + resultEntities.size());
                     }
                 });
 

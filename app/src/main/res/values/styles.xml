@@ -7,7 +7,7 @@
             @color/colorPrimary
         </item>
         <item name="colorPrimaryDark">
-            @color/colorPrimaryDark
+            @color/colorPrimary
         </item>
         <item name="colorAccent">
             @color/colorAccent

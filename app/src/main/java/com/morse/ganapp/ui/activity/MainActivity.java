@@ -29,9 +29,6 @@ public class MainActivity extends AppCompatActivity {
     DrawerLayout mDrawer;
     @InjectView(R.id.pager)
     ViewPager mPager;
-    @InjectView(R.id.tabs)
-    PagerSlidingTabStrip mTabs;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

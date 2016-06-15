@@ -33,7 +33,7 @@ public class ArtcleAdapter extends RecyclerView.Adapter<ArtcleAdapter.Holder> {
 
     @Override
     public Holder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item, null);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.artcle_item, null);
         return new Holder(view);
     }
 

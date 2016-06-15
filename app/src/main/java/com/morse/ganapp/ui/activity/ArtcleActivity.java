@@ -1,5 +1,6 @@
 package com.morse.ganapp.ui.activity;
 
+import android.annotation.TargetApi;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -26,6 +27,7 @@ import com.morse.ganapp.model.GanBean;
 import com.morse.ganapp.model.ResultEntity;
 import com.morse.ganapp.ui.utils.GanWebChromeClient;
 import com.morse.ganapp.ui.utils.GanWebViewClient;
+import com.readystatesoftware.systembartint.SystemBarTintManager;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -53,6 +55,33 @@ public class ArtcleActivity extends BaseActivity {
     @InjectView(R.id.webview)
     WebView mWebview;
 
+    private SystemBarTintManager mTintManager;
+
+    @TargetApi(19)
+//    private void setTranslucentStatus(Activity activity, boolean on) {
+//        Window win = activity.getWindow();
+//        WindowManager.LayoutParams winParams = win.getAttributes();
+//        final int bits = WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS;
+//        if (on) {
+//            winParams.flags |= bits;
+//            mTintManager.setStatusBarTintEnabled(true);
+//            mTintManager.setStatusBarTintResource(0);//状态栏无背景
+//        } else {
+//            winParams.flags &= ~bits;
+//            mTintManager.setStatusBarTintEnabled(false);
+//            mTintManager.setStatusBarTintResource(R.color.colorPrimaryDark);//状态栏无背景
+//        }
+//        win.setAttributes(winParams);
+//    }
+
+
+//    public void initSystemBar(Activity activity) {
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+//            setTranslucentStatus(activity, true);
+//        }
+//        mTintManager = new SystemBarTintManager(activity);
+//    }
+
     @Override
     protected void setLayout() {
         setContentView(R.layout.activity_artcle);
@@ -61,13 +90,15 @@ public class ArtcleActivity extends BaseActivity {
 
     @Override
     protected void afterView() {
+
+//        initSystemBar(this);
+
         String title = getIntent().getStringExtra("title");
         if (!TextUtils.isEmpty(title)) {
             Log.d("GanPagerAdapter", "ArtcleFragment loadData" + title);
             mArtcleToolbar.setTitle(title);
         }
         setSupportActionBar(mArtcleToolbar);
-
 
         GanService.createApi(GanApi.class, null)
                 .getGan("福利", 1)
@@ -147,8 +178,9 @@ public class ArtcleActivity extends BaseActivity {
     }
 
     private void colorChange() {
+//        setTranslucentStatus(this,true);
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), mArtcleBackdrop.getId());
-        Palette.generateAsync(bitmap, new Palette.PaletteAsyncListener() {
+        Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
             @Override
             public void onGenerated(Palette palette) {
                 Palette.Swatch vibrant = palette.getVibrantSwatch();
@@ -161,6 +193,8 @@ public class ArtcleActivity extends BaseActivity {
                 if (android.os.Build.VERSION.SDK_INT >= 21) {
                     Window window = getWindow();
                     // 很明显，这两货是新API才有的。
+                    SystemBarTintManager tintManager = new SystemBarTintManager(ArtcleActivity.this);
+                    tintManager.setStatusBarTintColor(colorBurn(vibrant.getRgb()));
                     window.setStatusBarColor(colorBurn(vibrant.getRgb()));
                     window.setNavigationBarColor(colorBurn(vibrant.getRgb()));
                 }

@@ -29,6 +29,8 @@ public class MainActivity extends AppCompatActivity {
     DrawerLayout mDrawer;
     @InjectView(R.id.pager)
     ViewPager mPager;
+    @InjectView(R.id.tabs)
+    PagerSlidingTabStrip mTabs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +39,6 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.inject(this);
 
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         setViewPager();
 

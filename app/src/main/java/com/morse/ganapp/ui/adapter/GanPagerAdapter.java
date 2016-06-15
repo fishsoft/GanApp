@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.util.Log;
 
 import com.morse.ganapp.ui.fragment.ArtcleFragment;
+import com.morse.ganapp.ui.fragment.WelfareFragmnet;
 
 import java.util.ArrayList;
 
@@ -28,9 +29,14 @@ public class GanPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
+        Fragment fragment = null;
         Bundle bundle = new Bundle();
         bundle.putString("position", mTypes[position]);
-        ArtcleFragment fragment = ArtcleFragment.getInstance();
+        if (mTypes[position].equals("福利")) {
+            fragment = WelfareFragmnet.getInstance();
+        } else {
+            fragment = ArtcleFragment.getInstance();
+        }
         fragment.setArguments(bundle);
         mFragments.add(fragment);
         Log.d("GanPagerAdaptel", "getItem:" + position);

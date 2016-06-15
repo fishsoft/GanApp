@@ -2,6 +2,9 @@
 <resources>
     <array name="ganType">
         <item>
+            福利
+        </item>
+        <item>
             Android
         </item>
         <item>

@@ -2,7 +2,6 @@ package com.morse.ganapp.ui.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
@@ -22,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
 /**
@@ -31,7 +29,7 @@ import butterknife.Unbinder;
  * 功能：
  * 邮箱：zm902485jgsurjgc@163.com
  */
-public class ArtcleFragment extends Fragment implements GanSubscribe.GankNext, SwipeRefreshLayout.OnRefreshListener, AutoRecyclerView.loadMoreListener {
+public class ArtcleFragment extends BaseFragment implements GanSubscribe.GankNext, SwipeRefreshLayout.OnRefreshListener, AutoRecyclerView.loadMoreListener {
 
     @BindView(R.id.artcle_recy)
     AutoRecyclerView mArtcleRecy;
@@ -55,25 +53,13 @@ public class ArtcleFragment extends Fragment implements GanSubscribe.GankNext, S
         mType = getArguments().getString("position");
     }
 
-    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if (null == view) {
-            view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_artcle, container, false);
-            unbinder = ButterKnife.bind(this, view);
-            initView();
-        } else {
-            ViewGroup parent = (ViewGroup) view.getParent();
-            if (null != parent) {
-                parent.removeView(view);
-            }
-        }
-
+    protected View setLayout(ViewGroup container) {
+        view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_artcle, container, false);
         return view;
     }
 
-    private void initView() {
-
+    protected void initView() {
         mArtcleSwipe.setOnRefreshListener(this);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         mArtcleRecy.setLayoutManager(layoutManager);

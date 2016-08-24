@@ -43,7 +43,7 @@ public class HttpsMethod {
     private HttpsMethod(Context context) {
         SSLSocketFactory sslSocketFactory = null;
         try {
-            sslSocketFactory = getSSLSocketFactory_Certificate(context, "BKS", R.raw.XXX);
+            sslSocketFactory = getSSLSocketFactory_Certificate(context, "BKS", R.raw.morse);
             OkHttpClient.Builder client = new OkHttpClient.Builder()
                     .certificatePinner(new CertificatePinner.Builder()
                             .add("YOU API.com", "sha1/DmxUShsZuNiqPQsX2Oi9uv2sCnw=")

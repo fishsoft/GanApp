@@ -2,15 +2,13 @@ package com.morse.ganapp.model;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.util.List;
-
 /**
  * 作者：Morse
  * 创建时间：2016/5/18 17:29
  * 功能：
  * 邮箱：zm902485jgsurjgc@163.com
  */
-public class GanBean {
+public class GanBean<T> {
 
     /**
      * error : false
@@ -31,7 +29,7 @@ public class GanBean {
      * who : 蒋朋
      */
     @SerializedName("results")
-    private List<ResultEntity> results;
+    private T results;
 
     public boolean isError() {
         return error;
@@ -41,11 +39,11 @@ public class GanBean {
         this.error = error;
     }
 
-    public List<ResultEntity> getResults() {
+    public T getResults() {
         return results;
     }
 
-    public void setResults(List<ResultEntity> results) {
+    public void setResults(T results) {
         this.results = results;
     }
 

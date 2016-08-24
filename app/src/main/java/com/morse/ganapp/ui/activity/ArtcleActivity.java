@@ -19,23 +19,18 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
 
-import com.bumptech.glide.BitmapTypeRequest;
 import com.bumptech.glide.Glide;
 import com.morse.ganapp.R;
-import com.morse.ganapp.apis.GanApi;
-import com.morse.ganapp.apis.GanService;
-import com.morse.ganapp.model.GanBean;
+import com.morse.ganapp.http.HttpMethod;
 import com.morse.ganapp.model.ResultEntity;
+import com.morse.ganapp.subscribe.GanSubscribe;
 import com.morse.ganapp.ui.utils.GanWebChromeClient;
 import com.morse.ganapp.ui.utils.GanWebViewClient;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 
-import butterknife.ButterKnife;
-import butterknife.InjectView;
-import rx.Observer;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
+import java.util.List;
+
+import butterknife.BindView;
 
 /**
  * 作者：Morse
@@ -43,22 +38,22 @@ import rx.schedulers.Schedulers;
  * 功能：
  * 邮箱：zm902485jgsurjgc@163.com
  */
-public class ArtcleActivity extends BaseActivity {
+public class ArtcleActivity extends BaseActivity implements GanSubscribe.GankNext {
 
-    @InjectView(R.id.artcle_backdrop)
+    @BindView(R.id.artcle_backdrop)
     ImageView mArtcleBackdrop;
-    @InjectView(R.id.artcle_toolbar)
+    @BindView(R.id.artcle_toolbar)
     Toolbar mArtcleToolbar;
-    @InjectView(R.id.artcle_collapsing)
+    @BindView(R.id.artcle_collapsing)
     CollapsingToolbarLayout mArtcleCollapsing;
-    @InjectView(R.id.artcle_appbar)
+    @BindView(R.id.artcle_appbar)
     AppBarLayout mArtcleAppbar;
-    @InjectView(R.id.webview)
+    @BindView(R.id.webview)
     WebView mWebview;
 
     @TargetApi(19)
     private void setTranslucentStatus(Activity activity, boolean on) {
-        SystemBarTintManager tintManager=new SystemBarTintManager(activity);
+        SystemBarTintManager tintManager = new SystemBarTintManager(activity);
         Window win = activity.getWindow();
         WindowManager.LayoutParams winParams = win.getAttributes();
         final int bits = WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS;
@@ -84,7 +79,6 @@ public class ArtcleActivity extends BaseActivity {
     @Override
     protected void setLayout() {
         setContentView(R.layout.activity_artcle);
-        ButterKnife.inject(this);
     }
 
     @Override
@@ -99,39 +93,7 @@ public class ArtcleActivity extends BaseActivity {
         }
         setSupportActionBar(mArtcleToolbar);
 
-        GanService.createApi(GanApi.class, null)
-                .getGan("福利", 1)
-                .subscribeOn(Schedulers.io())
-                .map(new Func1<GanBean, ResultEntity>() {
-                    @Override
-                    public ResultEntity call(GanBean ganBean) {
-                        return ganBean.getResults().get(0);
-                    }
-                })
-                .map(new Func1<ResultEntity, BitmapTypeRequest<String>>() {
-                    @Override
-                    public BitmapTypeRequest<String> call(ResultEntity resultEntity) {
-                        return Glide.with(ArtcleActivity.this).load(resultEntity.getUrl()).asBitmap();
-                    }
-                })
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<BitmapTypeRequest<String>>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        e.printStackTrace();
-                    }
-
-                    @Override
-                    public void onNext(BitmapTypeRequest<String> stringBitmapTypeRequest) {
-                        stringBitmapTypeRequest.into(mArtcleBackdrop);
-                        colorChange();
-                    }
-                });
+        HttpMethod.getInstance().getGan(new GanSubscribe<List<ResultEntity>>(this), "福利", 1);
 
         mUrl = getIntent().getStringExtra("url");
 
@@ -170,14 +132,8 @@ public class ArtcleActivity extends BaseActivity {
 
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        ButterKnife.reset(this);
-    }
-
     private void colorChange() {
-        setTranslucentStatus(this,true);
+        setTranslucentStatus(this, true);
 //        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), mArtcleBackdrop.getId());
 //        Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
 //            @Override
@@ -220,6 +176,20 @@ public class ArtcleActivity extends BaseActivity {
         green = (int) Math.floor(green * (1 - 0.1));
         blue = (int) Math.floor(blue * (1 - 0.1));
         return Color.rgb(red, green, blue);
+    }
+
+    @Override
+    public void onNext(Object o) {
+
+        List<ResultEntity> resultEntities = (List<ResultEntity>) o;
+        for (ResultEntity entity : resultEntities) {
+            Glide.with(ArtcleActivity.this).load(entity.getUrl()).asBitmap().into(mArtcleBackdrop);
+        }
+    }
+
+    @Override
+    public void onError(Throwable e) {
+
     }
 
     private class MyWebChromeClient extends WebChromeClient {

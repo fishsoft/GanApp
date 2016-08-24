@@ -7,7 +7,7 @@ import com.morse.ganapp.R;
 import com.morse.ganapp.ui.utils.GanWebChromeClient;
 import com.morse.ganapp.ui.utils.GanWebViewClient;
 
-import butterknife.InjectView;
+import butterknife.BindView;
 
 /**
  * 作者：Morse
@@ -17,7 +17,7 @@ import butterknife.InjectView;
  */
 public class VideoActivity extends BaseActivity {
 
-    @InjectView(R.id.video_web)
+    @BindView(R.id.video_web)
     WebView mVideoWeb;
 
     @Override

@@ -11,10 +11,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.morse.ganapp.R;
-import com.morse.ganapp.apis.GanApi;
-import com.morse.ganapp.apis.GanService;
-import com.morse.ganapp.model.GanBean;
+import com.morse.ganapp.http.HttpMethod;
 import com.morse.ganapp.model.ResultEntity;
+import com.morse.ganapp.subscribe.GanSubscribe;
 import com.morse.ganapp.ui.adapter.WelfareAdapter;
 import com.morse.ganapp.ui.utils.AutoRecyclerView;
 import com.morse.ganapp.ui.weight.SpacesItemDecoration;
@@ -22,11 +21,9 @@ import com.morse.ganapp.ui.weight.SpacesItemDecoration;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import rx.Observer;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
+import butterknife.Unbinder;
 
 /**
  * 作者：Morse
@@ -35,16 +32,19 @@ import rx.schedulers.Schedulers;
  * QQ:2450048085
  * 邮箱：zm902485jgsurjgc@163.com
  */
-public class WelfareFragmnet extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AutoRecyclerView.loadMoreListener {
+public class WelfareFragmnet extends Fragment implements GanSubscribe.GankNext, SwipeRefreshLayout.OnRefreshListener, AutoRecyclerView.loadMoreListener {
 
-    private AutoRecyclerView mWelfareRecy;
-    private SwipeRefreshLayout mWelfareSwipe;
+    @BindView(R.id.welfare_recy)
+    AutoRecyclerView mWelfareRecy;
+    @BindView(R.id.welfare_swipe)
+    SwipeRefreshLayout mWelfareSwipe;
     private View view;
 
     private List<ResultEntity> mResultEntities;
     private WelfareAdapter mAdapter;
     private String mType;
     private int mPage = 1;
+    private Unbinder unbinder;
 
     public static WelfareFragmnet getInstance() {
         WelfareFragmnet fragment = new WelfareFragmnet();
@@ -62,6 +62,7 @@ public class WelfareFragmnet extends Fragment implements SwipeRefreshLayout.OnRe
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if (null == view) {
             view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_welfare, container, false);
+            unbinder = ButterKnife.bind(this, view);
             initView();
         } else {
             ViewGroup parent = (ViewGroup) view.getParent();
@@ -69,13 +70,10 @@ public class WelfareFragmnet extends Fragment implements SwipeRefreshLayout.OnRe
                 parent.removeView(view);
             }
         }
-        ButterKnife.inject(this, view);
         return view;
     }
 
     protected void initView() {
-        mWelfareRecy = (AutoRecyclerView) view.findViewById(R.id.welfare_recy);
-        mWelfareSwipe = (SwipeRefreshLayout) view.findViewById(R.id.welfare_swipe);
         mWelfareSwipe.setOnRefreshListener(this);
         mWelfareRecy.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
         mWelfareRecy.addItemDecoration(new SpacesItemDecoration(10));
@@ -88,59 +86,45 @@ public class WelfareFragmnet extends Fragment implements SwipeRefreshLayout.OnRe
 
     private void loadData() {
         Log.d("loadData", "mPage:" + mPage);
-        GanService.createApi(GanApi.class, null)
-                .getGan(mType, 10, mPage)
-                .subscribeOn(Schedulers.io())
-                .map(new Func1<GanBean, List<ResultEntity>>() {
-                    @Override
-                    public List<ResultEntity> call(GanBean ganBean) {
-                        return ganBean.getResults();
-                    }
-                })
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<List<ResultEntity>>() {
-                    @Override
-                    public void onCompleted() {
-                        mWelfareSwipe.setRefreshing(false);
-                        mWelfareRecy.setLoading(false);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        e.printStackTrace();
-                        mWelfareSwipe.setRefreshing(false);
-                        mWelfareRecy.setLoading(false);
-                    }
-
-                    @Override
-                    public void onNext(List<ResultEntity> resultEntities) {
-                        if (1 == mPage) {
-                            mResultEntities.clear();
-                        }
-                        mResultEntities.addAll(resultEntities);
-                        mAdapter.notifyDataSetChanged();
-                        if (resultEntities.size() == 10) {
-                            mPage += 1;
-                        }
-                        Log.d("loadData", "size:" + resultEntities.size());
-                    }
-                });
+        HttpMethod.getInstance().getGan(new GanSubscribe<List<ResultEntity>>(this), mType, 10, mPage);
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        ButterKnife.reset(this);
+        unbinder.unbind();
     }
 
     @Override
     public void onRefresh() {
+        mWelfareSwipe.setRefreshing(true);
         mPage = 1;
         loadData();
     }
 
     @Override
     public void onLoadMore() {
+        mWelfareSwipe.setRefreshing(true);
         loadData();
+    }
+
+    @Override
+    public void onNext(Object o) {
+        mWelfareSwipe.setRefreshing(false);
+        List<ResultEntity> resultEntities = (List<ResultEntity>) o;
+        if (1 == mPage) {
+            mResultEntities.clear();
+        }
+        mResultEntities.addAll(resultEntities);
+        mAdapter.notifyDataSetChanged();
+        if (resultEntities.size() == 10) {
+            mPage += 1;
+        }
+    }
+
+    @Override
+    public void onError(Throwable e) {
+        mWelfareSwipe.setRefreshing(false);
+        e.printStackTrace();
     }
 }

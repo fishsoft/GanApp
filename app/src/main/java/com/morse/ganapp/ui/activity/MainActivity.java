@@ -14,26 +14,28 @@ import android.view.View;
 import com.morse.ganapp.R;
 import com.morse.ganapp.ui.adapter.GanPagerAdapter;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 
 public class MainActivity extends AppCompatActivity {
 
-    @InjectView(R.id.toolbar)
+    @BindView(R.id.toolbar)
     Toolbar mToolbar;
-    @InjectView(R.id.tab)
+    @BindView(R.id.tab)
     TabLayout mTab;
-    @InjectView(R.id.navigation)
+    @BindView(R.id.navigation)
     NavigationView mNavigation;
-    @InjectView(R.id.drawer)
+    @BindView(R.id.drawer)
     DrawerLayout mDrawer;
-    @InjectView(R.id.pager)
+    @BindView(R.id.pager)
     ViewPager mPager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ButterKnife.inject(this);
+
+        ButterKnife.bind(this);
 
         setSupportActionBar(mToolbar);
 
@@ -93,11 +95,5 @@ public class MainActivity extends AppCompatActivity {
         };
         mDrawer.addDrawerListener(toggle);
         toggle.syncState();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        ButterKnife.reset(this);
     }
 }

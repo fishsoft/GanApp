@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.morse.ganapp.R;
 import com.morse.ganapp.model.ResultEntity;
 import com.morse.ganapp.ui.activity.ArtcleActivity;
@@ -41,7 +42,12 @@ public class WelfareAdapter extends RecyclerView.Adapter<WelfareAdapter.Holder> 
 
     @Override
     public void onBindViewHolder(Holder holder, int position) {
-        Glide.with(mContext).load(mResultEntities.get(position).getUrl()).placeholder(R.mipmap.ic_launcher).error(R.mipmap.ic_launcher).into(holder.mIvWelfareImg);
+        Glide.with(mContext)
+                .load(mResultEntities.get(position).getUrl())
+                .placeholder(R.mipmap.ic_launcher)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .error(R.mipmap.ic_launcher)
+                .into(holder.mIvWelfareImg);
         holder.mTvWelfareDesc.setText(mResultEntities.get(position).getDesc());
     }
 

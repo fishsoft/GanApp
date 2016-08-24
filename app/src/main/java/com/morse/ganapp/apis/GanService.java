@@ -17,10 +17,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class GanService {
     private final static String BASE_URI = "http://gank.io/api/";
 
-    private GanService() {
-
-    }
-
     private static OkHttpClient getClient() {
         return new OkHttpClient.Builder()
                 .addInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))

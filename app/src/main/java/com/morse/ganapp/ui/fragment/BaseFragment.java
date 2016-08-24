@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
 /**
  * 作者：Morse
@@ -16,28 +17,20 @@ import butterknife.ButterKnife;
  * 功能：
  * 邮箱：zm902485jgsurjgc@163.com
  */
-public abstract class BaseFragment extends Fragment implements View.OnClickListener {
+public abstract class BaseFragment extends Fragment {
 
     protected View view;
+    private Unbinder unbinder;
 
     protected abstract View setLayout(ViewGroup container);
 
     protected void beforeView() {
     }
 
-    ;
-
     protected abstract void initView();
 
     protected void afterView() {
     }
-
-    ;
-
-    protected void viewClick(View view) {
-    }
-
-    ;
 
     @Override
     public void onAttach(Context context) {
@@ -49,7 +42,7 @@ public abstract class BaseFragment extends Fragment implements View.OnClickListe
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if (null == container) {
             view = setLayout(container);
-            ButterKnife.inject(getActivity());
+            unbinder = ButterKnife.bind(getActivity());
             beforeView();
             initView();
         }
@@ -57,12 +50,13 @@ public abstract class BaseFragment extends Fragment implements View.OnClickListe
     }
 
     @Override
-    public void onClick(View v) {
-        viewClick(v);
+    public void onDetach() {
+        super.onDetach();
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 }

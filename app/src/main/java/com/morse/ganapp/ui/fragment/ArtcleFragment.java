@@ -11,10 +11,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.morse.ganapp.R;
-import com.morse.ganapp.apis.GanApi;
-import com.morse.ganapp.apis.GanService;
-import com.morse.ganapp.model.GanBean;
+import com.morse.ganapp.http.HttpMethod;
 import com.morse.ganapp.model.ResultEntity;
+import com.morse.ganapp.subscribe.GanSubscribe;
 import com.morse.ganapp.ui.adapter.ArtcleAdapter;
 import com.morse.ganapp.ui.utils.AutoRecyclerView;
 import com.morse.ganapp.ui.utils.DividerItemDecoration;
@@ -22,11 +21,9 @@ import com.morse.ganapp.ui.utils.DividerItemDecoration;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import rx.Observer;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
+import butterknife.Unbinder;
 
 /**
  * 作者：Morse
@@ -34,15 +31,18 @@ import rx.schedulers.Schedulers;
  * 功能：
  * 邮箱：zm902485jgsurjgc@163.com
  */
-public class ArtcleFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AutoRecyclerView.loadMoreListener {
+public class ArtcleFragment extends Fragment implements GanSubscribe.GankNext, SwipeRefreshLayout.OnRefreshListener, AutoRecyclerView.loadMoreListener {
 
-    private AutoRecyclerView mArtcleRecy;
-    private SwipeRefreshLayout mArtcleSwipe;
+    @BindView(R.id.artcle_recy)
+    AutoRecyclerView mArtcleRecy;
+    @BindView(R.id.artcle_swipe)
+    SwipeRefreshLayout mArtcleSwipe;
     private View view;
     private ArtcleAdapter mAdapter;
     private List<ResultEntity> mResultEntities;
     private String mType;
     private int mPage = 1;
+    private Unbinder unbinder;
 
     public static ArtcleFragment getInstance() {
         ArtcleFragment fragment = new ArtcleFragment();
@@ -60,6 +60,7 @@ public class ArtcleFragment extends Fragment implements SwipeRefreshLayout.OnRef
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if (null == view) {
             view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_artcle, container, false);
+            unbinder = ButterKnife.bind(this, view);
             initView();
         } else {
             ViewGroup parent = (ViewGroup) view.getParent();
@@ -67,14 +68,11 @@ public class ArtcleFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 parent.removeView(view);
             }
         }
-        ButterKnife.inject(this, view);
+
         return view;
     }
 
     private void initView() {
-
-        mArtcleRecy = (AutoRecyclerView) view.findViewById(R.id.artcle_recy);
-        mArtcleSwipe = (SwipeRefreshLayout) view.findViewById(R.id.artcle_swipe);
 
         mArtcleSwipe.setOnRefreshListener(this);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
@@ -95,60 +93,45 @@ public class ArtcleFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     private void loadData() {
         Log.d("loadData", "mPage:" + mPage);
-        GanService.createApi(GanApi.class, null)
-                .getGan(mType, 10, mPage)
-                .subscribeOn(Schedulers.io())
-                .map(new Func1<GanBean, List<ResultEntity>>() {
-                    @Override
-                    public List<ResultEntity> call(GanBean ganBean) {
-                        return ganBean.getResults();
-                    }
-                })
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<List<ResultEntity>>() {
-                    @Override
-                    public void onCompleted() {
-                        mArtcleSwipe.setRefreshing(false);
-                        mArtcleRecy.setLoading(false);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        e.printStackTrace();
-                        mArtcleSwipe.setRefreshing(false);
-                        mArtcleRecy.setLoading(false);
-                    }
-
-                    @Override
-                    public void onNext(List<ResultEntity> resultEntities) {
-                        if (1 == mPage) {
-                            mResultEntities.clear();
-                        }
-                        mResultEntities.addAll(resultEntities);
-                        mAdapter.notifyDataSetChanged();
-                        if (resultEntities.size() == 10) {
-                            mPage += 1;
-                        }
-                        Log.d("loadData", "size:" + resultEntities.size());
-                    }
-                });
-
+        HttpMethod.getInstance().getGan(new GanSubscribe<List<ResultEntity>>(this), mType, 10, mPage);
     }
 
     @Override
     public void onRefresh() {
+        mArtcleSwipe.setRefreshing(true);
         mPage = 1;
         loadData();
     }
 
     @Override
     public void onLoadMore() {
+        mArtcleSwipe.setRefreshing(true);
         loadData();
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        ButterKnife.reset(this);
+        unbinder.unbind();
+    }
+
+    @Override
+    public void onNext(Object o) {
+        mArtcleSwipe.setRefreshing(false);
+        List<ResultEntity> resultEntities = (List<ResultEntity>) o;
+        if (1 == mPage) {
+            mResultEntities.clear();
+        }
+        mResultEntities.addAll(resultEntities);
+        mAdapter.notifyDataSetChanged();
+        if (resultEntities.size() == 10) {
+            mPage += 1;
+        }
+    }
+
+    @Override
+    public void onError(Throwable e) {
+        mArtcleSwipe.setRefreshing(false);
+        e.printStackTrace();
     }
 }

@@ -78,12 +78,6 @@ public class WelfareFragmnet extends BaseFragment implements GanSubscribe.GankNe
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
-    }
-
-    @Override
     public void onRefresh() {
         mWelfareSwipe.setRefreshing(true);
         mPage = 1;

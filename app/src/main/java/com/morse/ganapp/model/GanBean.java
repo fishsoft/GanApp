@@ -47,4 +47,11 @@ public class GanBean<T> {
         this.results = results;
     }
 
+    @Override
+    public String toString() {
+        return "GanBean{" +
+                "error=" + error +
+                ", results=" + results +
+                '}';
+    }
 }

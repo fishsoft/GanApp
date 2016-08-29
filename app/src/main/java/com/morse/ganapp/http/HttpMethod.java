@@ -1,10 +1,10 @@
 package com.morse.ganapp.http;
 
-import android.util.Log;
-
 import com.google.gson.Gson;
 import com.morse.ganapp.model.GanBean;
+import com.morse.ganapp.model.ResultDay;
 import com.morse.ganapp.model.ResultEntity;
+import com.morse.ganapp.ui.utils.LogUtils;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -61,8 +61,8 @@ public class HttpMethod {
         toSubscribe(observable, subscriber);
     }
 
-    public void getDailyGan(Subscriber<List<ResultEntity>> subscriber, int year, int mouth, int day) {
-        Observable observable = mGanApi.getDailyGan(year, mouth, day).map(new HttpResultFunc<List<ResultEntity>>());
+    public void getDailyGan(Subscriber<List<ResultDay>> subscriber, int year, int mouth, int day) {
+        Observable observable = mGanApi.getDailyGan(year, mouth, day).map(new HttpResultFunc<List<ResultDay>>());
 
         toSubscribe(observable, subscriber);
     }
@@ -82,8 +82,9 @@ public class HttpMethod {
 
         @Override
         public T call(GanBean<T> tGanBean) {
+            LogUtils.d("请求结果：" + tGanBean.toString());
             if (tGanBean.isError()) {
-                Log.d(getClass().getSimpleName(), "获取数据失败");
+                LogUtils.d("获取数据失败");
                 return null;
             }
             return tGanBean.getResults();

@@ -40,12 +40,10 @@ public abstract class BaseFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if (null == container) {
-            view = setLayout(container);
-            unbinder = ButterKnife.bind(getActivity());
-            beforeView();
-            initView();
-        }
+        view = setLayout(container);
+        unbinder = ButterKnife.bind(this,view);
+        beforeView();
+        initView();
         return view;
     }
 

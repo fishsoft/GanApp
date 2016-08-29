@@ -1,18 +1,12 @@
 package com.morse.ganapp.ui.activity;
 
-import android.annotation.TargetApi;
-import android.app.Activity;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.os.Build;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -22,12 +16,16 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.morse.ganapp.R;
 import com.morse.ganapp.http.HttpMethod;
+import com.morse.ganapp.model.ResultDay;
 import com.morse.ganapp.model.ResultEntity;
 import com.morse.ganapp.subscribe.GanSubscribe;
 import com.morse.ganapp.ui.utils.GanWebChromeClient;
 import com.morse.ganapp.ui.utils.GanWebViewClient;
-import com.readystatesoftware.systembartint.SystemBarTintManager;
+import com.morse.ganapp.ui.utils.LogUtils;
+import com.morse.ganapp.ui.utils.ParseJsoup;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
@@ -38,7 +36,7 @@ import butterknife.BindView;
  * 功能：
  * 邮箱：zm902485jgsurjgc@163.com
  */
-public class ArtcleActivity extends BaseActivity implements GanSubscribe.GankNext {
+public class ArtcleActivity extends BaseActivity {
 
     @BindView(R.id.artcle_backdrop)
     ImageView mArtcleBackdrop;
@@ -50,31 +48,6 @@ public class ArtcleActivity extends BaseActivity implements GanSubscribe.GankNex
     AppBarLayout mArtcleAppbar;
     @BindView(R.id.webview)
     WebView mWebview;
-
-    @TargetApi(19)
-    private void setTranslucentStatus(Activity activity, boolean on) {
-        SystemBarTintManager tintManager = new SystemBarTintManager(activity);
-        Window win = activity.getWindow();
-        WindowManager.LayoutParams winParams = win.getAttributes();
-        final int bits = WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS;
-        if (on) {
-            winParams.flags |= bits;
-            tintManager.setStatusBarTintEnabled(true);
-            tintManager.setStatusBarTintResource(0);//状态栏无背景
-        } else {
-            winParams.flags &= ~bits;
-            tintManager.setStatusBarTintEnabled(false);
-            tintManager.setStatusBarTintResource(R.color.colorPrimaryDark);//状态栏无背景
-        }
-        win.setAttributes(winParams);
-    }
-
-
-    public void initSystemBar(Activity activity) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            setTranslucentStatus(activity, true);
-        }
-    }
 
     @Override
     protected void setLayout() {
@@ -93,14 +66,38 @@ public class ArtcleActivity extends BaseActivity implements GanSubscribe.GankNex
         }
         setSupportActionBar(mArtcleToolbar);
 
-        HttpMethod.getInstance().getGan(new GanSubscribe<List<ResultEntity>>(this), "福利", 1);
+        HttpMethod.getInstance().getGan(new GanSubscribe<List<ResultEntity>>(new GanSubscribe.GankNext() {
+            @Override
+            public void onNext(Object o) {
+                List<ResultEntity> entities = (List<ResultEntity>) o;
+                Glide.with(ArtcleActivity.this).load(entities.get(0).getUrl()).asBitmap().into(mArtcleBackdrop);
+            }
 
-        mUrl = getIntent().getStringExtra("url");
+            @Override
+            public void onError(Throwable e) {
 
-        initWebView();
+            }
+        }), "福利", 1);
 
-        mWebview.loadUrl(mUrl);
+        HttpMethod.getInstance().getDailyGan(new GanSubscribe<List<ResultDay>>(new GanSubscribe.GankNext() {
+            @Override
+            public void onNext(Object o) {
+                List<String> types = null;
+                ArrayList<ArrayList<HashMap<String, String>>> contents = null;
+                List<ResultDay> resultEntities = (List<ResultDay>) o;
+                for (ResultDay entity : resultEntities) {
+                    types = ParseJsoup.parseType(entity.getContent());
+                    contents = ParseJsoup.parseProgram(entity.getContent());
+                }
+                LogUtils.d(types == null ? "" : types.toString());
+                LogUtils.d(resultEntities == null ? "" : contents.toString());
+            }
 
+            @Override
+            public void onError(Throwable e) {
+
+            }
+        }), 2016, 8, 24);
     }
 
     /**
@@ -129,66 +126,6 @@ public class ArtcleActivity extends BaseActivity implements GanSubscribe.GankNex
         mWebview.setWebViewClient(new GanWebViewClient(this));
         //设置WebChromeClient
         mWebview.setWebChromeClient(new GanWebChromeClient(this));
-
-    }
-
-    private void colorChange() {
-        setTranslucentStatus(this, true);
-//        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), mArtcleBackdrop.getId());
-//        Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
-//            @Override
-//            public void onGenerated(Palette palette) {
-//                Palette.Swatch vibrant = palette.getVibrantSwatch();
-//            /* 界面颜色UI统一性处理,看起来更Material一些 */
-//                mArtcleAppbar.setBackgroundColor(vibrant.getRgb());
-//                //    mArtcleAppbar.setTextColor(vibrant.getTitleTextColor());
-//                // 其中状态栏、游标、底部导航栏的颜色需要加深一下，也可以不加，具体情况在代码之后说明
-//
-//                mArtcleToolbar.setBackgroundColor(vibrant.getRgb());
-//                if (android.os.Build.VERSION.SDK_INT >= 21) {
-//                    Window window = getWindow();
-//                    // 很明显，这两货是新API才有的。
-//                    SystemBarTintManager tintManager = new SystemBarTintManager(ArtcleActivity.this);
-//                    tintManager.setStatusBarTintColor(colorBurn(vibrant.getRgb()));
-//                    window.setStatusBarColor(colorBurn(vibrant.getRgb()));
-//                    window.setNavigationBarColor(colorBurn(vibrant.getRgb()));
-//                }
-//            }
-//        });
-    }
-
-    /**
-     * 颜色加深处理
-     *
-     * @param RGBValues RGB的值，由alpha（透明度）、red（红）、green（绿）、blue（蓝）构成，
-     *                  Android中我们一般使用它的16进制，
-     *                  例如："#FFAABBCC",最左边到最右每两个字母就是代表alpha（透明度）、
-     *                  red（红）、green（绿）、blue（蓝）。每种颜色值占一个字节(8位)，值域0~255
-     *                  所以下面使用移位的方法可以得到每种颜色的值，然后每种颜色值减小一下，在合成RGB颜色，颜色就会看起来深一些了
-     * @return
-     */
-    private int colorBurn(int RGBValues) {
-        int alpha = RGBValues >> 24;
-        int red = RGBValues >> 16 & 0xFF;
-        int green = RGBValues >> 8 & 0xFF;
-        int blue = RGBValues & 0xFF;
-        red = (int) Math.floor(red * (1 - 0.1));
-        green = (int) Math.floor(green * (1 - 0.1));
-        blue = (int) Math.floor(blue * (1 - 0.1));
-        return Color.rgb(red, green, blue);
-    }
-
-    @Override
-    public void onNext(Object o) {
-
-        List<ResultEntity> resultEntities = (List<ResultEntity>) o;
-        for (ResultEntity entity : resultEntities) {
-            Glide.with(ArtcleActivity.this).load(entity.getUrl()).asBitmap().into(mArtcleBackdrop);
-        }
-    }
-
-    @Override
-    public void onError(Throwable e) {
 
     }
 

@@ -1,6 +1,7 @@
 package com.morse.ganapp.http;
 
 import com.morse.ganapp.model.GanBean;
+import com.morse.ganapp.model.ResultDay;
 import com.morse.ganapp.model.ResultEntity;
 
 import java.util.List;
@@ -49,6 +50,6 @@ public interface GanApi {
      * @param daily 日
      * @return ResultEntity
      */
-    @GET("day/{year}/{mouth}/{daily}")
-    Observable<GanBean<List<ResultEntity>>> getDailyGan(@Path("year") int year, @Path("mouth") int mouth, @Path("daily") int daily);
+    @GET("history/content/day/{year}/{mouth}/{daily}")
+    Observable<GanBean<List<ResultDay>>> getDailyGan(@Path("year") int year, @Path("mouth") int mouth, @Path("daily") int daily);
 }

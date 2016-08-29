@@ -1,8 +1,16 @@
 package com.morse.ganapp.ui.activity;
 
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Window;
+import android.view.WindowManager;
+
+import com.morse.ganapp.R;
+import com.readystatesoftware.systembartint.SystemBarTintManager;
 
 import butterknife.ButterKnife;
 
@@ -19,7 +27,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected abstract void setLayout();
 
     protected void beforeView() {
-    };
+    }
 
     protected abstract void afterView();
 
@@ -37,33 +45,29 @@ public abstract class BaseActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    /**
-     * 初始化WebView设置
-     */
-//    protected void initWebView(Activity activity, WebView webView) {
-//        WebSettings settings = webView.getSettings();
-//        //自适应屏幕
-//        settings.setUseWideViewPort(true);
-//        settings.setLoadWithOverviewMode(true);
-//        //加载js
-//        settings.setJavaScriptEnabled(true);
-//        //缓存
-//        settings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
-//        //自动加载图片
-//        settings.setLoadsImagesAutomatically(true);
-//        // 设置显示缩放按钮
-//        settings.setBuiltInZoomControls(true);
-//        //支持手动缩放
-//        settings.setSupportZoom(true);
-//        //允许访问文件
-//        settings.setAllowFileAccess(true);
-//        //显示图片
-//        settings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NARROW_COLUMNS);
-//        //设置WebViewClient
-//        if (!TextUtils.isEmpty(mUrl)) {
-//            webView.setWebViewClient(new GanWebViewClient(activity, mUrl));
-//        }
-//        //设置WebChromeClient
-//        webView.setWebChromeClient(new GanWebChromeClient(activity));
-//    }
+    @TargetApi(19)
+    private void setTranslucentStatus(Activity activity, boolean on) {
+        SystemBarTintManager tintManager = new SystemBarTintManager(activity);
+        Window win = activity.getWindow();
+        WindowManager.LayoutParams winParams = win.getAttributes();
+        final int bits = WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS;
+        if (on) {
+            winParams.flags |= bits;
+            tintManager.setStatusBarTintEnabled(true);
+            tintManager.setStatusBarTintResource(0);//状态栏无背景
+        } else {
+            winParams.flags &= ~bits;
+            tintManager.setStatusBarTintEnabled(false);
+            tintManager.setStatusBarTintResource(R.color.colorPrimaryDark);//状态栏无背景
+        }
+        win.setAttributes(winParams);
+    }
+
+
+    public void initSystemBar(Activity activity) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            setTranslucentStatus(activity, true);
+        }
+    }
+
 }

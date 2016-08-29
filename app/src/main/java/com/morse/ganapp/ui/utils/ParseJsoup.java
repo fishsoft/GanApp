@@ -1,5 +1,7 @@
 package com.morse.ganapp.ui.utils;
 
+import android.text.TextUtils;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -18,6 +20,9 @@ import java.util.HashMap;
 public class ParseJsoup {
 
     public static ArrayList<String> parseType(String html) {
+        if(TextUtils.isEmpty(html)){
+            return null;
+        }
         Document document = Jsoup.parse(html);
         Elements elements = document.getElementsByTag("h3");
         ArrayList<String> types = null;
@@ -28,6 +33,9 @@ public class ParseJsoup {
     }
 
     public static ArrayList<ArrayList<HashMap<String, String>>> parseProgram(String html) {
+        if(TextUtils.isEmpty(html)){
+            return null;
+        }
         Document document = Jsoup.parse(html);
         ArrayList<ArrayList<HashMap<String, String>>> lists = new ArrayList<>();
         Elements elements1 = document.getElementsByTag("ul");

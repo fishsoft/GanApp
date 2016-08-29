@@ -96,14 +96,9 @@ public class ArtcleFragment extends BaseFragment implements GanSubscribe.GankNex
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
-    }
-
-    @Override
     public void onNext(Object o) {
         mArtcleSwipe.setRefreshing(false);
+
         List<ResultEntity> resultEntities = (List<ResultEntity>) o;
         if (1 == mPage) {
             mResultEntities.clear();

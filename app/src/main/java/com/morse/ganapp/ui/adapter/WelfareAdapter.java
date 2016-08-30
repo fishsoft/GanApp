@@ -89,11 +89,12 @@ public class WelfareAdapter extends RecyclerView.Adapter<WelfareAdapter.Holder> 
                     String s = (String) time.subSequence(0, 10);
                     String[] strings = s.split("-");
                     Intent intent = new Intent(mContext, ArtcleActivity.class);
-                    StringBuffer buffer=new StringBuffer("http://gank.io/api/history/content/day");
-                    for (String url : strings) {
-                        buffer.append("/"+url);
-                    }
-                    intent.putExtra("url", buffer.toString());
+//                    StringBuffer buffer=new StringBuffer("http://gank.io/api/history/content/day");
+//                    for (String url : strings) {
+//                        buffer.append("/"+url);
+//                    }
+//                    intent.putExtra("url", "http://gank.io/");
+                    intent.putExtra("date", strings);
                     mContext.startActivity(intent);
                     break;
                 default:

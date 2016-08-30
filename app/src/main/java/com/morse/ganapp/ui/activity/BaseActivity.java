@@ -6,6 +6,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -20,7 +21,7 @@ import butterknife.ButterKnife;
  * 功能：
  * 邮箱：zm902485jgsurjgc@163.com
  */
-public abstract class BaseActivity extends AppCompatActivity {
+public abstract class BaseActivity extends AppCompatActivity implements View.OnClickListener {
 
     protected String mUrl;
 
@@ -30,6 +31,8 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     protected abstract void afterView();
+
+    protected void tryRequest(){}
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -70,4 +73,12 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.tv_net_error:
+                tryRequest();
+                break;
+        }
+    }
 }

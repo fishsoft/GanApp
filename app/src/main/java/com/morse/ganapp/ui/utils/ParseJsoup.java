@@ -20,20 +20,21 @@ import java.util.HashMap;
 public class ParseJsoup {
 
     public static ArrayList<String> parseType(String html) {
-        if(TextUtils.isEmpty(html)){
+        if (TextUtils.isEmpty(html)) {
             return null;
         }
         Document document = Jsoup.parse(html);
+        LogUtils.d(document.text() + "");
         Elements elements = document.getElementsByTag("h3");
-        ArrayList<String> types = null;
+        ArrayList<String> types = new ArrayList<>();
         for (Element element : elements) {
-            types.add(element.nodeName());
+            types.add(element.text());
         }
-        return types;
+        return types.size() <= 0 ? null : types;
     }
 
     public static ArrayList<ArrayList<HashMap<String, String>>> parseProgram(String html) {
-        if(TextUtils.isEmpty(html)){
+        if (TextUtils.isEmpty(html)) {
             return null;
         }
         Document document = Jsoup.parse(html);
@@ -44,8 +45,10 @@ public class ParseJsoup {
             Elements links = elements1.get(i).select("a[href]");
             for (Element link : links) {
                 HashMap<String, String> map = new HashMap<>();
-                map.put(link.text(), link.attr("abs:href"));
-                maps.add(map);
+                if(!TextUtils.isEmpty(link.text())){
+                    map.put(link.text(), link.attr("abs:href"));
+                    maps.add(map);
+                }
             }
             lists.add(maps);
         }

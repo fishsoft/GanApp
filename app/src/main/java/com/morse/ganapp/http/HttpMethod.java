@@ -1,6 +1,5 @@
 package com.morse.ganapp.http;
 
-import com.google.gson.Gson;
 import com.morse.ganapp.model.GanBean;
 import com.morse.ganapp.model.ResultDay;
 import com.morse.ganapp.model.ResultEntity;
@@ -27,8 +26,8 @@ import rx.schedulers.Schedulers;
  * 邮箱：zm902485jgsurjgc@163.com
  */
 public class HttpMethod {
-    private final static String BASE_URI = "http://gank.io/api/";
-    private final static int DEFAULT_TIMEOUT = 30 * 1000;
+    public final static String BASE_URI = "http://gank.io/api/";
+    private final static int DEFAULT_TIMEOUT = 10 * 1000;
     private Retrofit retrofit;
     private GanApi mGanApi;
 
@@ -37,7 +36,7 @@ public class HttpMethod {
         builder.connectTimeout(DEFAULT_TIMEOUT, TimeUnit.MILLISECONDS);
 
         retrofit = new Retrofit.Builder()
-                .addConverterFactory(GsonConverterFactory.create(new Gson()))
+                .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .client(builder.build())
                 .baseUrl(BASE_URI)
@@ -82,9 +81,8 @@ public class HttpMethod {
 
         @Override
         public T call(GanBean<T> tGanBean) {
-            LogUtils.d("请求结果：" + tGanBean.toString());
+            LogUtils.d("请求完成：" + tGanBean.toString());
             if (tGanBean.isError()) {
-                LogUtils.d("获取数据失败");
                 return null;
             }
             return tGanBean.getResults();

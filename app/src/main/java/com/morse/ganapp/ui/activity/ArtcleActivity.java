@@ -12,6 +12,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.morse.ganapp.R;
@@ -21,7 +22,6 @@ import com.morse.ganapp.model.ResultEntity;
 import com.morse.ganapp.subscribe.GanSubscribe;
 import com.morse.ganapp.ui.utils.GanWebChromeClient;
 import com.morse.ganapp.ui.utils.GanWebViewClient;
-import com.morse.ganapp.ui.utils.LogUtils;
 import com.morse.ganapp.ui.utils.ParseJsoup;
 
 import java.util.ArrayList;
@@ -48,10 +48,22 @@ public class ArtcleActivity extends BaseActivity {
     AppBarLayout mArtcleAppbar;
     @BindView(R.id.webview)
     WebView mWebview;
+    @BindView(R.id.tv_net_error)
+    TextView mTvNetError;
+
+    private String mUrl;
+    private String[] date;
 
     @Override
     protected void setLayout() {
         setContentView(R.layout.activity_artcle);
+    }
+
+    @Override
+    protected void beforeView() {
+        super.beforeView();
+        mUrl = getIntent().getStringExtra("url");
+        date = getIntent().getStringArrayExtra("date");
     }
 
     @Override
@@ -75,29 +87,64 @@ public class ArtcleActivity extends BaseActivity {
 
             @Override
             public void onError(Throwable e) {
-
+                try {
+                    e.printStackTrace();
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
             }
         }), "福利", 1);
 
+        if (!TextUtils.isEmpty(mUrl)) {
+            if (mTvNetError.getVisibility() != View.VISIBLE) {
+                mTvNetError.setVisibility(View.VISIBLE);
+            }
+            initWebView();
+            mWebview.loadUrl(mUrl);
+        } else if (date != null && date.length > 0) {
+            if (mTvNetError.getVisibility() != View.VISIBLE) {
+                mTvNetError.setVisibility(View.VISIBLE);
+            }
+            getDateData();
+        } else {
+            if (mTvNetError.getVisibility() != View.GONE) {
+                mTvNetError.setVisibility(View.GONE);
+            }
+        }
+
+    }
+
+    private void getDateData() {
         HttpMethod.getInstance().getDailyGan(new GanSubscribe<List<ResultDay>>(new GanSubscribe.GankNext() {
             @Override
             public void onNext(Object o) {
-                List<String> types = null;
-                ArrayList<ArrayList<HashMap<String, String>>> contents = null;
-                List<ResultDay> resultEntities = (List<ResultDay>) o;
-                for (ResultDay entity : resultEntities) {
-                    types = ParseJsoup.parseType(entity.getContent());
-                    contents = ParseJsoup.parseProgram(entity.getContent());
+                if (o == null) {
+                    return;
                 }
-                LogUtils.d(types == null ? "" : types.toString());
-                LogUtils.d(resultEntities == null ? "" : contents.toString());
+                ArrayList<ResultDay> resultEntities = (ArrayList<ResultDay>) o;
+                if (resultEntities != null && resultEntities.size() > 0) {
+                    //解析网页数据
+                    List<String> types = ParseJsoup.parseType(resultEntities.get(0).getContent());
+                    ArrayList<ArrayList<HashMap<String, String>>> contents = ParseJsoup.parseProgram(resultEntities.get(0).getContent());
+                    //显示数据
+                }
             }
 
             @Override
             public void onError(Throwable e) {
-
+                try {
+                    e.printStackTrace();
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
             }
-        }), 2016, 8, 24);
+        }), Integer.parseInt(date[0]), Integer.parseInt(date[1]), Integer.parseInt(date[2]));
+    }
+
+    @Override
+    protected void tryRequest() {
+        super.tryRequest();
+        getDateData();
     }
 
     /**
@@ -162,4 +209,5 @@ public class ArtcleActivity extends BaseActivity {
             super.onPageFinished(view, url);
         }
     }
+
 }

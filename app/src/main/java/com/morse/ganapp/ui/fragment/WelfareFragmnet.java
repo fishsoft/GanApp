@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,7 +29,8 @@ import butterknife.Unbinder;
  * QQ:2450048085
  * 邮箱：zm902485jgsurjgc@163.com
  */
-public class WelfareFragmnet extends BaseFragment implements GanSubscribe.GankNext, SwipeRefreshLayout.OnRefreshListener, AutoRecyclerView.loadMoreListener {
+public class WelfareFragmnet extends BaseFragment implements GanSubscribe.GankNext,
+        SwipeRefreshLayout.OnRefreshListener, AutoRecyclerView.loadMoreListener {
 
     @BindView(R.id.welfare_recy)
     AutoRecyclerView mWelfareRecy;
@@ -73,7 +73,6 @@ public class WelfareFragmnet extends BaseFragment implements GanSubscribe.GankNe
     }
 
     private void loadData() {
-        Log.d("loadData", "mPage:" + mPage);
         HttpMethod.getInstance().getGan(new GanSubscribe<List<ResultEntity>>(this), mType, 10, mPage);
     }
 

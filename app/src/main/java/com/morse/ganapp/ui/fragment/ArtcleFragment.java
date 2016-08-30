@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -78,7 +77,6 @@ public class ArtcleFragment extends BaseFragment implements GanSubscribe.GankNex
     }
 
     private void loadData() {
-        Log.d("loadData", "mPage:" + mPage);
         HttpMethod.getInstance().getGan(new GanSubscribe<List<ResultEntity>>(this), mType, 10, mPage);
     }
 

@@ -6,4 +6,6 @@ package com.morse.ganapp.ui.interfaces;
  * Descripte：
  */
 public interface IArtcleView {
+    void onSuccess(String imgUrl);
+    void onFailure();
 }

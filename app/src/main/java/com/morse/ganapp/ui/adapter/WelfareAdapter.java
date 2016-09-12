@@ -13,7 +13,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.morse.ganapp.R;
 import com.morse.ganapp.model.ResultEntity;
-import com.morse.ganapp.ui.activity.ArtcleActivity;
+import com.morse.ganapp.ui.activity.DailyActivity;
 
 import java.util.List;
 
@@ -88,7 +88,7 @@ public class WelfareAdapter extends RecyclerView.Adapter<WelfareAdapter.Holder> 
                     String time = mResultEntities.get(position).getCreatedAt();
                     String s = (String) time.subSequence(0, 10);
                     String[] strings = s.split("-");
-                    Intent intent = new Intent(mContext, ArtcleActivity.class);
+                    Intent intent = new Intent(mContext, DailyActivity.class);
 //                    StringBuffer buffer=new StringBuffer("http://gank.io/api/history/content/day");
 //                    for (String url : strings) {
 //                        buffer.append("/"+url);

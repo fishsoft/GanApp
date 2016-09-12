@@ -1,6 +1,11 @@
 package com.morse.ganapp.presenter;
 
+import com.morse.ganapp.http.HttpMethod;
+import com.morse.ganapp.model.ResultEntity;
+import com.morse.ganapp.subscribe.GanSubscribe;
 import com.morse.ganapp.ui.interfaces.IArtcleView;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -18,6 +23,26 @@ public class ArtclePresenter extends BasePresenter {
     @Inject
     public ArtclePresenter(IArtcleView artcleView){
         iArtcleView=artcleView;
+    }
+
+    public void getImgUrl(){
+        HttpMethod.getInstance().getGan(new GanSubscribe<List<ResultEntity>>(new GanSubscribe.GankNext() {
+            @Override
+            public void onNext(Object o) {
+                List<ResultEntity> entities = (List<ResultEntity>) o;
+                iArtcleView.onSuccess(entities.get(0).getUrl());
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                try {
+                    e.printStackTrace();
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
+                iArtcleView.onFailure();
+            }
+        }), "福利", 1);
     }
 
 }

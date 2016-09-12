@@ -1,8 +1,10 @@
 package com.morse.ganapp.ui.fragment;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,14 +15,13 @@ import com.morse.ganapp.http.HttpMethod;
 import com.morse.ganapp.model.ResultEntity;
 import com.morse.ganapp.subscribe.GanSubscribe;
 import com.morse.ganapp.ui.adapter.WelfareAdapter;
-import com.morse.ganapp.ui.utils.AutoRecyclerView;
+import com.morse.ganapp.ui.interfaces.EndLessOnScrollListener;
 import com.morse.ganapp.ui.weight.SpacesItemDecoration;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.Unbinder;
 
 /**
  * 作者：Morse
@@ -29,11 +30,10 @@ import butterknife.Unbinder;
  * QQ:2450048085
  * 邮箱：zm902485jgsurjgc@163.com
  */
-public class WelfareFragmnet extends BaseFragment implements GanSubscribe.GankNext,
-        SwipeRefreshLayout.OnRefreshListener, AutoRecyclerView.loadMoreListener {
+public class WelfareFragmnet extends BaseFragment implements GanSubscribe.GankNext, SwipeRefreshLayout.OnRefreshListener {
 
     @BindView(R.id.welfare_recy)
-    AutoRecyclerView mWelfareRecy;
+    RecyclerView mWelfareRecy;
     @BindView(R.id.welfare_swipe)
     SwipeRefreshLayout mWelfareSwipe;
     private View view;
@@ -42,7 +42,6 @@ public class WelfareFragmnet extends BaseFragment implements GanSubscribe.GankNe
     private WelfareAdapter mAdapter;
     private String mType;
     private int mPage = 1;
-    private Unbinder unbinder;
 
     public static WelfareFragmnet getInstance() {
         WelfareFragmnet fragment = new WelfareFragmnet();
@@ -62,36 +61,43 @@ public class WelfareFragmnet extends BaseFragment implements GanSubscribe.GankNe
     }
 
     protected void initView() {
+        mWelfareSwipe.setColorSchemeColors(Color.BLUE, Color.GREEN, Color.RED);
         mWelfareSwipe.setOnRefreshListener(this);
-        mWelfareRecy.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+        StaggeredGridLayoutManager gridLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+        mWelfareRecy.setLayoutManager(gridLayoutManager);
         mWelfareRecy.addItemDecoration(new SpacesItemDecoration(10));
-        mWelfareRecy.setLoadMoreListener(this);
+        mWelfareRecy.addOnScrollListener(new EndLessOnScrollListener(gridLayoutManager) {
+            @Override
+            public void onLoadMore(int currentPage) {
+                mWelfareSwipe.setRefreshing(true);
+                loadData(currentPage);
+            }
+        });
         mResultEntities = new ArrayList<>();
         mAdapter = new WelfareAdapter(getActivity(), mResultEntities);
         mWelfareRecy.setAdapter(mAdapter);
-        loadData();
+        loadData(mPage);
     }
 
-    private void loadData() {
-        HttpMethod.getInstance().getGan(new GanSubscribe<List<ResultEntity>>(this), mType, 10, mPage);
+    private void loadData(int currentPage) {
+        HttpMethod.getInstance().getGan(new GanSubscribe<List<ResultEntity>>(this), mType, 10, currentPage);
     }
 
     @Override
     public void onRefresh() {
+        if (mWelfareSwipe.isRefreshing()) {
+            mWelfareSwipe.setRefreshing(false);
+        }
         mWelfareSwipe.setRefreshing(true);
         mPage = 1;
-        loadData();
-    }
-
-    @Override
-    public void onLoadMore() {
-        mWelfareSwipe.setRefreshing(true);
-        loadData();
+        loadData(mPage);
     }
 
     @Override
     public void onNext(Object o) {
-        mWelfareSwipe.setRefreshing(false);
+        if (mWelfareSwipe.isRefreshing()) {
+            mWelfareSwipe.setRefreshing(false);
+        }
         List<ResultEntity> resultEntities = (List<ResultEntity>) o;
         if (1 == mPage) {
             mResultEntities.clear();
@@ -105,7 +111,9 @@ public class WelfareFragmnet extends BaseFragment implements GanSubscribe.GankNe
 
     @Override
     public void onError(Throwable e) {
-        mWelfareSwipe.setRefreshing(false);
+        if (mWelfareSwipe.isRefreshing()) {
+            mWelfareSwipe.setRefreshing(false);
+        }
         e.printStackTrace();
     }
 }

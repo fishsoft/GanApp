@@ -6,4 +6,6 @@ package com.morse.ganapp.ui.interfaces;
  * Descripte：
  */
 public interface IDailyView {
+    void onSuccess(String html);
+    void onFailure();
 }

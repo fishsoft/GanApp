@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView
+    android:id="@+id/card_view"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="5dp"
-    android:id="@+id/card_view"
-    android:orientation="vertical"
     app:cardBackgroundColor="@color/cardview_light_background"
     app:cardCornerRadius="5dp">
 
@@ -37,17 +36,18 @@
         </LinearLayout>
 
         <RelativeLayout
-            android:layout_marginTop="10dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/container"
-            android:orientation="horizontal">
+            android:layout_marginTop="10dp">
 
             <TextView
                 android:id="@+id/artcle_who"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="5dp"
+                android:layout_alignParentLeft="true"
+                android:text="代码家"
                 android:textColor="@android:color/white"/>
 
             <TextView
@@ -57,7 +57,8 @@
                 android:layout_alignBaseline="@+id/artcle_who"
                 android:layout_centerInParent="true"
                 android:layout_toRightOf="@+id/artcle_who"
-                android:padding="5dp"/>
+                android:padding="5dp"
+                android:text="文章类型"/>
 
             <TextView
                 android:id="@+id/artcle_public"
@@ -66,7 +67,8 @@
                 android:layout_alignBaseline="@+id/artcle_who"
                 android:layout_alignParentRight="true"
                 android:layout_toRightOf="@+id/artcle_type"
-                android:padding="5dp"/>
+                android:padding="5dp"
+                android:text="时间"/>
         </RelativeLayout>
     </RelativeLayout>
 

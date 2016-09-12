@@ -23,6 +23,7 @@
         </activity>
         <activity android:name=".ui.activity.ArtcleActivity"/>
         <activity android:name=".ui.activity.VideoActivity"/>
+        <activity android:name=".ui.activity.DailyActivity"/>
     </application>
 
 </manifest>

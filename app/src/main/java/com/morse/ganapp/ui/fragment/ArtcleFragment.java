@@ -1,9 +1,11 @@
 package com.morse.ganapp.ui.fragment;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,14 +15,13 @@ import com.morse.ganapp.http.HttpMethod;
 import com.morse.ganapp.model.ResultEntity;
 import com.morse.ganapp.subscribe.GanSubscribe;
 import com.morse.ganapp.ui.adapter.ArtcleAdapter;
-import com.morse.ganapp.ui.utils.AutoRecyclerView;
+import com.morse.ganapp.ui.interfaces.EndLessOnScrollListener;
 import com.morse.ganapp.ui.utils.DividerItemDecoration;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.Unbinder;
 
 /**
  * 作者：Morse
@@ -28,10 +29,10 @@ import butterknife.Unbinder;
  * 功能：
  * 邮箱：zm902485jgsurjgc@163.com
  */
-public class ArtcleFragment extends BaseFragment implements GanSubscribe.GankNext, SwipeRefreshLayout.OnRefreshListener, AutoRecyclerView.loadMoreListener {
+public class ArtcleFragment extends BaseFragment implements GanSubscribe.GankNext, SwipeRefreshLayout.OnRefreshListener{
 
     @BindView(R.id.artcle_recy)
-    AutoRecyclerView mArtcleRecy;
+    RecyclerView mArtcleRecy;
     @BindView(R.id.artcle_swipe)
     SwipeRefreshLayout mArtcleSwipe;
     private View view;
@@ -39,7 +40,6 @@ public class ArtcleFragment extends BaseFragment implements GanSubscribe.GankNex
     private List<ResultEntity> mResultEntities;
     private String mType;
     private int mPage = 1;
-    private Unbinder unbinder;
 
     public static ArtcleFragment getInstance() {
         ArtcleFragment fragment = new ArtcleFragment();
@@ -59,12 +59,19 @@ public class ArtcleFragment extends BaseFragment implements GanSubscribe.GankNex
     }
 
     protected void initView() {
+        mArtcleSwipe.setColorSchemeColors(Color.BLUE, Color.GREEN, Color.RED);
         mArtcleSwipe.setOnRefreshListener(this);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         mArtcleRecy.setLayoutManager(layoutManager);
         mArtcleRecy.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration
                 .VERTICAL_LIST));
-        mArtcleRecy.setLoadMoreListener(this);
+        mArtcleRecy.addOnScrollListener(new EndLessOnScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int currentPage) {
+                mArtcleSwipe.setRefreshing(true);
+                loadData();
+            }
+        });
 
         initData();
         loadData();
@@ -84,12 +91,6 @@ public class ArtcleFragment extends BaseFragment implements GanSubscribe.GankNex
     public void onRefresh() {
         mArtcleSwipe.setRefreshing(true);
         mPage = 1;
-        loadData();
-    }
-
-    @Override
-    public void onLoadMore() {
-        mArtcleSwipe.setRefreshing(true);
         loadData();
     }
 

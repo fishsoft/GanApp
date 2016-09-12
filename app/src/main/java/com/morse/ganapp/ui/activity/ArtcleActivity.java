@@ -5,7 +5,6 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -13,20 +12,18 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.morse.ganapp.R;
-import com.morse.ganapp.http.HttpMethod;
-import com.morse.ganapp.model.ResultDay;
-import com.morse.ganapp.model.ResultEntity;
-import com.morse.ganapp.subscribe.GanSubscribe;
+import com.morse.ganapp.dagger.componet.DaggerArtcleComponet;
+import com.morse.ganapp.dagger.module.ArtcleModule;
+import com.morse.ganapp.presenter.ArtclePresenter;
+import com.morse.ganapp.ui.interfaces.IArtcleView;
 import com.morse.ganapp.ui.utils.GanWebChromeClient;
 import com.morse.ganapp.ui.utils.GanWebViewClient;
-import com.morse.ganapp.ui.utils.ParseJsoup;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import javax.inject.Inject;
 
 import butterknife.BindView;
 
@@ -36,7 +33,7 @@ import butterknife.BindView;
  * 功能：
  * 邮箱：zm902485jgsurjgc@163.com
  */
-public class ArtcleActivity extends BaseActivity {
+public class ArtcleActivity extends BaseActivity implements IArtcleView {
 
     @BindView(R.id.artcle_backdrop)
     ImageView mArtcleBackdrop;
@@ -51,8 +48,10 @@ public class ArtcleActivity extends BaseActivity {
     @BindView(R.id.tv_net_error)
     TextView mTvNetError;
 
+    @Inject
+    ArtclePresenter presenter;
+
     private String mUrl;
-    private String[] date;
 
     @Override
     protected void setLayout() {
@@ -63,7 +62,6 @@ public class ArtcleActivity extends BaseActivity {
     protected void beforeView() {
         super.beforeView();
         mUrl = getIntent().getStringExtra("url");
-        date = getIntent().getStringArrayExtra("date");
     }
 
     @Override
@@ -73,27 +71,13 @@ public class ArtcleActivity extends BaseActivity {
 
         String title = getIntent().getStringExtra("title");
         if (!TextUtils.isEmpty(title)) {
-            Log.d("GanPagerAdapter", "ArtcleFragment loadData" + title);
             mArtcleToolbar.setTitle(title);
         }
         setSupportActionBar(mArtcleToolbar);
 
-        HttpMethod.getInstance().getGan(new GanSubscribe<List<ResultEntity>>(new GanSubscribe.GankNext() {
-            @Override
-            public void onNext(Object o) {
-                List<ResultEntity> entities = (List<ResultEntity>) o;
-                Glide.with(ArtcleActivity.this).load(entities.get(0).getUrl()).asBitmap().into(mArtcleBackdrop);
-            }
+        DaggerArtcleComponet.builder().artcleModule(new ArtcleModule(this)).build().inject(this);
 
-            @Override
-            public void onError(Throwable e) {
-                try {
-                    e.printStackTrace();
-                } catch (Exception e1) {
-                    e1.printStackTrace();
-                }
-            }
-        }), "福利", 1);
+        presenter.getImgUrl();
 
         if (!TextUtils.isEmpty(mUrl)) {
             if (mTvNetError.getVisibility() != View.VISIBLE) {
@@ -101,11 +85,6 @@ public class ArtcleActivity extends BaseActivity {
             }
             initWebView();
             mWebview.loadUrl(mUrl);
-        } else if (date != null && date.length > 0) {
-            if (mTvNetError.getVisibility() != View.VISIBLE) {
-                mTvNetError.setVisibility(View.VISIBLE);
-            }
-            getDateData();
         } else {
             if (mTvNetError.getVisibility() != View.GONE) {
                 mTvNetError.setVisibility(View.GONE);
@@ -114,37 +93,9 @@ public class ArtcleActivity extends BaseActivity {
 
     }
 
-    private void getDateData() {
-        HttpMethod.getInstance().getDailyGan(new GanSubscribe<List<ResultDay>>(new GanSubscribe.GankNext() {
-            @Override
-            public void onNext(Object o) {
-                if (o == null) {
-                    return;
-                }
-                ArrayList<ResultDay> resultEntities = (ArrayList<ResultDay>) o;
-                if (resultEntities != null && resultEntities.size() > 0) {
-                    //解析网页数据
-                    List<String> types = ParseJsoup.parseType(resultEntities.get(0).getContent());
-                    ArrayList<ArrayList<HashMap<String, String>>> contents = ParseJsoup.parseProgram(resultEntities.get(0).getContent());
-                    //显示数据
-                }
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                try {
-                    e.printStackTrace();
-                } catch (Exception e1) {
-                    e1.printStackTrace();
-                }
-            }
-        }), Integer.parseInt(date[0]), Integer.parseInt(date[1]), Integer.parseInt(date[2]));
-    }
-
     @Override
     protected void tryRequest() {
         super.tryRequest();
-        getDateData();
     }
 
     /**
@@ -174,6 +125,16 @@ public class ArtcleActivity extends BaseActivity {
         //设置WebChromeClient
         mWebview.setWebChromeClient(new GanWebChromeClient(this));
 
+    }
+
+    @Override
+    public void onSuccess(String imgUrl) {
+        Glide.with(ArtcleActivity.this).load(imgUrl).asBitmap().into(mArtcleBackdrop);
+    }
+
+    @Override
+    public void onFailure() {
+        Toast.makeText(this, "加载数据失败", Toast.LENGTH_SHORT).show();
     }
 
     private class MyWebChromeClient extends WebChromeClient {
